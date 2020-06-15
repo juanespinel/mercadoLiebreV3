@@ -10,7 +10,7 @@ const controller = {
 	// Root - Show all products
 	root: (req, res) => {
 		res.render('products', {
-			productos: products
+			producto: products
 		})
 	},
 	
@@ -20,11 +20,10 @@ const controller = {
 		for(let i = 0; i < products.length; i++) {
 			if(products[i].id == idProducto) {
 				res.render('detail', {
-					producto: products[i],
-					alert: null
-				});
-			};
-		};
+					producto: products[i]
+				})
+			}
+		}
 	},
 	
 	// Create - Form to create
@@ -46,7 +45,6 @@ const controller = {
 	
 	// Update - Form to edit
 	edit: (req, res) => {
-		idProdcuto = req.params.productId;
 		for(let i = 0; i < products.length; i++) {
 			if (products[i].id == req.params.productId) {
 				res.render ('product-edit-form', {
@@ -58,36 +56,25 @@ const controller = {
 	// Update - Method to update
 	update: (req, res) => {
 		let prodcutoActualizado = {
-			id: req.params.productId,
+			id: Number(req.params.productId),
 			...req.body
 		};
 		for(let i = 0; i < products.length; i++) {
-			if (products[i].id == req.params.productId) {
+			if (products[i].id == prodcutoActualizado.id) {
 				products[i] = prodcutoActualizado;
-				fs.writeFileSync(path.join(__dirname, '../data/productsDataBase.json'), productosActualizados);
-				res.redirect('/products/detail' + prodcutoActualizado.id, {
-					alert: {
-						Status: "success",
-						message: "El producto a sido modificado"
-					}
-				})
+				fs.writeFileSync(path.join(__dirname, '../data/productsDataBase.json'), JSON.stringify(products));
+				res.redirect('/products/detail/' + prodcutoActualizado.id)
 			}
 		}
-
-				res.render ('product-edit-form', {
-					producto: products[i]
-
-		products.push(nuevoProdcuto);
-		let productosActualizados = JSON.stringify(products);
-		fs.writeFileSync(path.join(__dirname, '../data/productsDataBase.json'), productosActualizados);
-		res.redirect('/products/detail/' + nuevoProdcuto.id)
 	},
 	
 	// Delete - Delete one product from DB
 	destroy : (req, res) => {
 		for(let i = 0; i < products.length; i++) {
 			if(products[i].id == req.params.productId) {
-				
+				let index = products.indexOf(products[i]); products.splice(index, 1);
+				fs.writeFileSync(path.join(__dirname, '../data/productsDataBase.json'), JSON.stringify(products));
+				res.redirect('/products?status=ok')
 			}
 		}
 	}
